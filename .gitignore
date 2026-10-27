@@ -1,0 +1,20 @@
+# Qoder IDE 本地缓存
+.qoder/
+
+# OS 生成物
+.DS_Store
+Thumbs.db
+
+# 若被放入/打开为 Unity 工程时产生的生成物（本仓库为 UPM 包，正常不含）
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+*.csproj
+*.sln
+*.user
+
+# 注意：.meta 文件是 UPM 包的一部分（承载稳定 GUID），必须入库，切勿忽略。
