@@ -12,7 +12,7 @@ GGFramework 各模块共享基础类的**单一源**（single source of truth）
 | `CoroutineUtil` | 全局 | 四仓库一致 | 协程封装，依赖 `Singleton<CoroutineUtil>` |
 | `TaskSystem` / `GTask` | `GGFramework.GGTask` | GGNetwork 版 | 线程/任务管理 |
 
-**延后到 Phase 2**（含第三方耦合，需拆为可选子程序集）：`GameDebugger`（耦合 CodeStage.AdvancedFPSCounter）、`ZipUtil`（耦合 SharpZipLib）、`UIAdaptor`/`LogAdaptor`（命名空间专属 + SimpleJson 依赖）。
+**不纳入 Core**（含第三方耦合；Phase 3 已定案：改为「副本对齐」而非拆为可选子程序集，详见 `GGFramework-Docs` 的 ADR-0003）：`GameDebugger`（耦合 CodeStage.AdvancedFPSCounter）、`ZipUtil`（耦合 SharpZipLib）、`UIAdaptor`/`LogAdaptor`（命名空间专属 + SimpleJson 依赖）。这些副本仍留在各消费方仓库，通过消除无意义漂移 + 修复 P0 缺陷来对齐，并保留有意的行为分叉（如 Demo 版 `GameDebugger` 不自动挂 FPS 计数器 / 不注册全局日志回调）。
 
 ## 目录结构
 
@@ -35,10 +35,10 @@ GGFramework-Core/            (仓库根即包根)
 
 本包为**独立仓库**（`GGFramework-Core`），仓库根即 UPM 包根，与任何消费方工程解耦，是纯加法、可逆的"安全基础层"。
 
-消费方经 UPM git URL 引用（仓库根即包根，无需 `?path=`；建议锁定 tag 版本）：
+消费方经 UPM git URL 引用（仓库根即包根，无需 `?path=`；建议锁定 tag 版本）。当前 `GGResource` / `GGNetwork` / `GGUI` / `GGUser` / `Demo` 五个工程均已接线并统一锁定 **v0.1.1**：
 
 ```json
-"com.gonglei.ggframework.core": "https://github.com/gonglei007/GGFramework-Core.git#v0.1.0"
+"com.gonglei.ggframework.core": "https://github.com/gonglei007/GGFramework-Core.git#v0.1.1"
 ```
 
 ## 运行测试
