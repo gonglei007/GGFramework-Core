@@ -27,6 +27,19 @@ GGFramework 各模块共享基础类的**单一源**（single source of truth）
 
 > v0.2.0 为**纯加法**变更，不改动既有 `Singleton`/`CoroutineUtil`/`TaskSystem`，因此仍锁定 `#v0.1.1` 的消费方不受影响；需要三件套的工程可将 UPM 引用升到 `#v0.2.0`。
 
+## v0.3.0 增补：主线程派发 / 平台路径 / 通用工具
+
+从业务项目（WJSanGuo2）提炼出的三项**零第三方依赖**通用基础设施，填补 Core 现有能力空白，统一位于 `GGFramework.Core` 命名空间：
+
+| 类 | 文件 | 说明 |
+|---|---|---|
+| `MainThreadDispatcher` | `Runtime/MainThreadDispatcher.cs` | 主线程派发器：静态 `ConcurrentQueue<Action>` + MonoBehaviour 每帧泵，`Post`（在主线程立即执行、否则入队）/`Enqueue`/`ProcessQueue`（异常隔离）/`IsMainThread`/`PendingCount`；派发 API 全静态，EditMode 测试无需 GameObject 即可驱动。修正原版仅靠静态字段初始化器捕获主线程 ID 的隐患 |
+| `PersistentPathResolver` | `Runtime/PersistentPathResolver.cs` | 跨设备可写持久化路径解析：`IsDirectoryWritable` 写探针、Android 分区存储下 `Internal`/`External` 回退、best-first 的 `Candidates`/`Best`、`FileExists`；编辑器与非 Android 回退 `Application.persistentDataPath` |
+| `FormatUtil` | `Runtime/FormatUtil.cs` | 通用格式化/编码纯函数：`DataSize`（字节→"1.5 MB"）、`UnixTimestampMs`、`Md5Hex`（小写 32 位十六进制） |
+| `NetUtil` | `Runtime/NetUtil.cs` | 通用网络纯函数：`HostFromUrl`、`ResolveHostAddress`（带超时的同步 DNS）、`Sign`（查询参数按 key 排序后 MD5 签名）；已剔除原版的 MonoBehaviour 基类、SimpleJson 依赖与业务/编辑器专属方法 |
+
+> v0.3.0 为**纯加法**变更，不改动既有类，锁定 `#v0.1.1` 的消费方不受影响；需要这批工具的工程可将 UPM 引用升到 `#v0.3.0`。本次不接线任何消费方。
+
 ## 目录结构
 
 ```
@@ -39,7 +52,11 @@ GGFramework-Core/            (仓库根即包根)
 │   ├── TaskSystem.cs
 │   ├── ObjectPool.cs        (Pool<T> / GameObjectPool)
 │   ├── StateMachine.cs      (StateMachine<TState>)
-│   └── EventBus.cs          (EventBus)
+│   ├── EventBus.cs          (EventBus)
+│   ├── MainThreadDispatcher.cs   (MainThreadDispatcher)
+│   ├── PersistentPathResolver.cs (PersistentPathResolver)
+│   ├── FormatUtil.cs        (FormatUtil)
+│   └── NetUtil.cs           (NetUtil)
 └── Tests/
     ├── GGFramework.Core.Tests.asmdef   (EditMode, UNITY_INCLUDE_TESTS)
     ├── CoreStructureTests.cs
@@ -47,7 +64,11 @@ GGFramework-Core/            (仓库根即包根)
     ├── GTaskTests.cs
     ├── ObjectPoolTests.cs
     ├── StateMachineTests.cs
-    └── EventBusTests.cs
+    ├── EventBusTests.cs
+    ├── MainThreadDispatcherTests.cs
+    ├── PersistentPathResolverTests.cs
+    ├── FormatUtilTests.cs
+    └── NetUtilTests.cs
 ```
 
 ## 存放位置与接入方式
@@ -73,6 +94,6 @@ GGFramework-Core/            (仓库根即包根)
 }
 ```
 
-随后在 Test Runner 窗口或用命令行 `-runTests -testPlatform EditMode` 即可发现并运行全部用例（当前 44 个，已在 Unity 6000.3.13f1 验证全绿）。
+随后在 Test Runner 窗口或用命令行 `-runTests -testPlatform EditMode` 即可发现并运行全部用例（当前 64 个，已在 Unity 6000.3.13f1 验证全绿）。
 
 > **Phase 2 关键约束**：`Singleton`/`CoroutineUtil` 位于全局命名空间。消费方一旦引用 Core，又同时保留本地 `Assembly-CSharp` 中的同名副本，会触发类型二义性编译错误。因此"引用 Core"必须与"删除本地副本"同批完成，不能分步。

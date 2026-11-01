@@ -1,8 +1,8 @@
 {
   "name": "com.gonglei.ggframework.core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "displayName": "GGFramework Core",
-  "description": "GGFramework 各模块共享基础类的单一源（Singleton / CoroutineUtil / TaskSystem，及 v0.2.0 增补的对象池 / 状态机 / 事件总线）。仅纳入零第三方依赖类，独立于消费方工程存放，供后续经 UPM git 引用接入，以消除各仓库源码拷贝导致的副本漂移。",
+  "description": "GGFramework 各模块共享基础类的单一源（Singleton / CoroutineUtil / TaskSystem，v0.2.0 增补的对象池 / 状态机 / 事件总线，及 v0.3.0 增补的主线程派发器 / 平台持久化路径解析 / 通用格式化与网络工具）。仅纳入零第三方依赖类，独立于消费方工程存放，供后续经 UPM git 引用接入，以消除各仓库源码拷贝导致的副本漂移。",
   "unity": "2021.3",
   "author": {
     "name": "gonglei007"
@@ -15,6 +15,10 @@
     "task",
     "objectpool",
     "statemachine",
-    "eventbus"
+    "eventbus",
+    "dispatcher",
+    "persistentpath",
+    "format",
+    "netutil"
   ]
 }
