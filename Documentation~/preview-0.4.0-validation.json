@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-20",
+  "timezone": "Asia/Shanghai",
+  "baseCommit": "6418f0ef6da2e3dd29f49280f4ae7b1220d9e270",
+  "packageVersion": "0.4.0-preview.1",
+  "sourceHashEncoding": "SHA-256 of UTF-8 text after CRLF to LF normalization",
+  "sourceHashes": {
+    "Runtime/BudgetedResourceCache.cs": "e7961d81f9825ef68ca1857c413c5b2cc74bb6bd76e69fa75b97955d33761655",
+    "Runtime/ResourceRequestQueue.cs": "04af4f1171305247601ae0e9740dce53e806438210eb77264027ffd80a1ea034",
+    "Tests/ResourceManagementScenarios.cs": "6c276cce803541e653d748eeb5af3c1683e1f4fb2c0d3d1a5e45918160a1f0a7",
+    "Tests/ResourceManagementTests.cs": "a76e3efb22f7730ecc1c86ebe1c2af059d546f83ab1ae251cebec291fb5a4d20",
+    "Tests~/ResourceContracts/ResourceContracts.csproj": "5985775721e35cdca9f54d1b5b21d1a9bae4f716e0726db1c62797ce486bd25e",
+    "Tests~/ResourceContracts/Program.cs": "2c1daec2c57113c34cf23a414c0113590dfddede22745357857f6f1d7c8006bf",
+    "Tests~/ResourceContracts/NuGet.Config": "5256a7e3e07d2c5c94f7a1e6c45f39aab011c659c5e2d53e452dea525ce04575",
+    "package.json": "e035c80768bc767c8077330075d46d3790b40eafc5666e0332a076d2cecd989f"
+  },
+  "results": [
+    {
+      "kind": "SDK resource contracts",
+      "sdk": "10.0.401",
+      "language": "C# 9",
+      "passed": 38,
+      "failed": 0
+    },
+    {
+      "kind": "Unity EditMode",
+      "editor": "6000.3.13f1",
+      "testFramework": "1.6.0",
+      "passed": 104,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kind": "Unity EditMode",
+      "editor": "2021.3.45f1",
+      "testFramework": "1.1.33",
+      "passed": 104,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kind": "Documentation samples",
+      "compiled": 2,
+      "executed": 2,
+      "failed": 0
+    }
+  ],
+  "scope": "Local preview source; host IO and consumer integration are not covered."
+}

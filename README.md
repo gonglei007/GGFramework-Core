@@ -102,20 +102,26 @@ GGFramework-Core/            (仓库根即包根)
 │   ├── MainThreadDispatcher.cs   (MainThreadDispatcher)
 │   ├── PersistentPathResolver.cs (PersistentPathResolver)
 │   ├── FormatUtil.cs        (FormatUtil)
-│   └── NetUtil.cs           (NetUtil)
-└── Tests/
-    ├── GGFramework.Core.Tests.asmdef   (EditMode, UNITY_INCLUDE_TESTS)
-    ├── CoreStructureTests.cs
-    ├── SingletonLifetimeTests.cs
-    ├── GTaskTests.cs
-    ├── TaskSystemTests.cs
-    ├── ObjectPoolTests.cs
-    ├── StateMachineTests.cs
-    ├── EventBusTests.cs
-    ├── MainThreadDispatcherTests.cs
-    ├── PersistentPathResolverTests.cs
-    ├── FormatUtilTests.cs
-    └── NetUtilTests.cs
+│   ├── NetUtil.cs           (NetUtil)
+│   ├── BudgetedResourceCache.cs (加权 LRU 与范围保护，预览版)
+│   └── ResourceRequestQueue.cs  (请求准入与取消租约，预览版)
+├── Tests/
+│   ├── GGFramework.Core.Tests.asmdef   (EditMode, UNITY_INCLUDE_TESTS)
+│   ├── CoreStructureTests.cs
+│   ├── SingletonLifetimeTests.cs
+│   ├── GTaskTests.cs
+│   ├── TaskSystemTests.cs
+│   ├── ObjectPoolTests.cs
+│   ├── StateMachineTests.cs
+│   ├── EventBusTests.cs
+│   ├── MainThreadDispatcherTests.cs
+│   ├── PersistentPathResolverTests.cs
+│   ├── FormatUtilTests.cs
+│   ├── NetUtilTests.cs
+│   ├── ResourceManagementScenarios.cs (NUnit / SDK 共享契约)
+│   └── ResourceManagementTests.cs
+├── Tests~/ResourceContracts/ (独立 SDK 测试入口，Unity 忽略)
+└── Documentation~/resource-management.md (资源管理接入契约)
 ```
 
 ## 存放位置与接入方式
@@ -141,12 +147,28 @@ GGFramework-Core/            (仓库根即包根)
 }
 ```
 
-随后在 Test Runner 窗口或用命令行 `-runTests -testPlatform EditMode` 即可发现并运行全部用例（当前 66 个，已在 Unity 6000.3.13f1 验证全绿）。
+随后在 Test Runner 窗口或用命令行 `-runTests -testPlatform EditMode` 运行包测试。固定 `v0.3.0` 包有 66 个测试；本地 `0.4.0-preview.1` 在此基础上增加 38 个资源契约用例。测试预览源码时必须切换到本地路径或包含预览修改的完整 Git 提交，不能用稳定标签的结果代替。
 
 Demo 已启用 `testables`，可直接用它运行固定版本的包测试。需要修改 Core 源码时，开发者可以自行将依赖临时改为本地路径；对于 `GGFramework/<消费仓库>/<Unity工程>/Packages/manifest.json` 的同级仓库布局，该路径为 `file:../../../GGFramework-Core`（Unity 从 `Packages` 目录解析），默认发布配置不使用本地路径。
+
+资源缓存 / 队列也提供不依赖 Unity 的独立入口，需要 .NET 10 SDK。在 Core 仓库根目录运行：
+
+```powershell
+dotnet run --project "Tests~/ResourceContracts/ResourceContracts.csproj" --configuration Release
+```
+
+此入口只运行两项新增基础设施的 38 个契约场景，不替代全量 Unity 回归。[独立测试说明](Tests~/ResourceContracts/README.md)列出环境与退出码，[资源接入文档](Documentation~/resource-management.md)说明宿主边界。
 
 ### Demo 集成修复
 
 任务系统现在会在宿主销毁时退出后台队列循环，`Init` 重复调用不会创建多个队列泵；队列忙时短暂休眠，避免空转。超时的任务可以继续结束，系统不会对仍在运行的 Task 调用 `Dispose`。`GTask` 在启动线程前登记完成回调，修复快速任务丢失回调的竞态。超时只允许队列继续推进，不会强制取消工作函数；工作函数应自行处理取消或终止。
 
 > **Phase 2 关键约束**：`Singleton`/`CoroutineUtil` 位于全局命名空间。消费方一旦引用 Core，又同时保留本地 `Assembly-CSharp` 中的同名副本，会触发类型二义性编译错误。因此"引用 Core"必须与"删除本地副本"同批完成，不能分步。
+
+## 0.4.0-preview.1：资源缓存与请求准入（预览版）
+
+`BudgetedResourceCache<TKey, TValue>` 提供加权 LRU、范围保护和预算回收；`ResourceRequestQueue<TKey, TRequest>` 提供键去重、FIFO 并发准入及取消租约。两者都是单线程纯托管基础设施，实际 I/O、Unity 对象释放和界面绑定由宿主提供。
+
+缓存保护是整个使用范围的布尔标记，不是多消费者引用计数；队列取消只使租约失效，宿主还需终止 I/O 并释放过时结果。释放回调和请求工厂的重入有明确限制。完整 API、生命周期顺序与可运行示例见[资源管理接入文档](Documentation~/resource-management.md)。
+
+稳定发布仍为 `v0.3.0`；预览代码进入 `main` 不等于发布版本标签。采用项目须固定完整来源和包摘要，不能把预览版号当作验证结果。版本范围见 [CHANGELOG](CHANGELOG.md)，实际环境与结果见[预览版验证记录](Documentation~/preview-0.4.0-validation.md)。

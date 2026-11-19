@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0-preview.1] - 2026-11-20
+
+- 新增纯托管 `BudgetedResourceCache<TKey, TValue>`：加权 LRU、使用范围保护、显式 trim / clear、清理错误聚合与释放回调重入保护。
+- 新增 `ResourceRequestQueue<TKey, TRequest>`：同键排队 / 运行去重、FIFO 并发准入、租约身份检查、同步完成与范围取消；请求工厂禁止重入修改队列，失败不注册请求。
+- 补齐 38 个共享资源契约场景，由 NUnit EditMode 与无第三方依赖的 .NET 10 独立入口执行，保留既有 Core API。
+- 补充资源管理 API、所有权 / 取消边界、可运行示例及验证方式。预算是宿主声明的权重，取消只解除逻辑租约；真实 I/O、消费者引用与对象释放仍由宿主负责。
+- 此版本为预览包；稳定标签与 Demo 的固定依赖仍为 `v0.3.0`，本次不发布新标签或更改消费工程依赖。
+
 ## [0.3.0] - 2026-11-19
 
 - 新增主线程派发器 `MainThreadDispatcher`、跨设备可写路径解析 `PersistentPathResolver`、格式化与编码工具 `FormatUtil`、网络工具 `NetUtil`。

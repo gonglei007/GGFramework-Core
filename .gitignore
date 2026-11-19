@@ -12,9 +12,15 @@ Obj/
 Build/
 Builds/
 Logs/
+Logs.meta
 UserSettings/
 *.csproj
 *.sln
 *.user
+
+# SDK-only contract runner (Unity ignores folders ending in ~).
+!Tests~/ResourceContracts/ResourceContracts.csproj
+Tests~/ResourceContracts/bin/
+Tests~/ResourceContracts/obj/
 
 # 注意：.meta 文件是 UPM 包的一部分（承载稳定 GUID），必须入库，切勿忽略。
