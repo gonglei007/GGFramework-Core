@@ -1,6 +1,52 @@
 # GGFramework Core
 
-GGFramework 各模块共享基础类的**单一源**（single source of truth），用于消除五个仓库长期靠源码拷贝（vendoring）集成导致的**副本漂移**问题。
+GGFramework 的共享基础库，以独立 UPM 包维护单例、协程与任务、对象池、状态机、事件总线、主线程派发及通用工具；零第三方依赖。
+
+[![Unity 2021.3+](https://img.shields.io/badge/Unity-2021.3%2B-222222?logo=unity)](https://github.com/gonglei007/GGFramework-Core/blob/v0.3.0/package.json) [![Core stable v0.3.0](https://img.shields.io/badge/Core_stable-v0.3.0-2563eb)](https://github.com/gonglei007/GGFramework-Core/tree/v0.3.0) [![Branch main](https://img.shields.io/badge/Branch-main-64748b)](https://github.com/gonglei007/GGFramework-Core/tree/main)
+
+## 项目导航
+
+[Demo 体验](https://github.com/gonglei007/GGFramework-Demo) · [架构文档](https://github.com/gonglei007/GGFramework-Docs) · **Core** · [GGResource](https://github.com/gonglei007/GGFramework-GGResource) · [GGNetwork](https://github.com/gonglei007/GGFramework-GGNetwork) · [GGUI](https://github.com/gonglei007/GGFramework-GGUI) · [GGUser](https://github.com/gonglei007/GGFramework-GGUser)
+
+> **先体验整体框架**：[打开独立 Demo](https://github.com/gonglei007/GGFramework-Demo#快速开始)，体验资源、HTTP、UI、用户 SDK 与 Lua 的集成流程。[操作指南](https://github.com/gonglei007/GGFramework-Demo/blob/main/documents/showcase-guide.md) · [验收记录](https://github.com/gonglei007/GGFramework-Demo/blob/main/documents/showcase-verification.md)。
+
+## 模块关系
+
+Core 是五个 Unity 工程共同引用的基础层。各工程按自己的 manifest 固定版本；当前稳定发布为 **v0.3.0**，Demo 使用该版本，其他模块的实际锁定版本见对应模块的 README。模块业务代码和第三方适配实现由各自仓库维护。
+
+完整依赖图、工程锁定版本和源码副本边界由[架构文档中心](https://github.com/gonglei007/GGFramework-Docs#模块关系)统一维护。
+
+## 快速开始
+
+1. 安装 Git，并确保 Unity Hub 启动的编辑器能找到 Git。Core 包声明最低 Unity **2021.3**，统一体验工程使用 **6000.3.13f1**。
+2. 将下列依赖条目合并到现有 Unity 工程的 `Packages/manifest.json`，等待 Package Manager 完成解析：
+
+```json
+{
+  "dependencies": {
+    "com.gonglei.ggframework.core": "https://github.com/gonglei007/GGFramework-Core.git#v0.3.0"
+  }
+}
+```
+
+3. 创建 `CoreHello.cs` 并挂到场景对象，播放后 Console 输出 `1`：
+
+```csharp
+using UnityEngine;
+using GGFramework.Core;
+
+public sealed class CoreHello : MonoBehaviour
+{
+    private void Start()
+    {
+        var events = new EventBus();
+        events.Subscribe<int>(value => Debug.Log(value));
+        events.Publish(1);
+    }
+}
+```
+
+4. 通过[独立 Demo](https://github.com/gonglei007/GGFramework-Demo#快速开始)运行对象池、状态机和主线程回调示例；包测试的开启方式见[运行测试](#运行测试)。[版本变更](CHANGELOG.md)记录各次发布；稳定接入示例固定使用已发布标签。
 
 ## Phase 1 范围
 
