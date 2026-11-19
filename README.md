@@ -38,7 +38,7 @@ GGFramework 各模块共享基础类的**单一源**（single source of truth）
 | `FormatUtil` | `Runtime/FormatUtil.cs` | 通用格式化/编码纯函数：`DataSize`（字节→"1.5 MB"）、`UnixTimestampMs`、`Md5Hex`（小写 32 位十六进制） |
 | `NetUtil` | `Runtime/NetUtil.cs` | 通用网络纯函数：`HostFromUrl`、`ResolveHostAddress`（带超时的同步 DNS）、`Sign`（查询参数按 key 排序后 MD5 签名）；已剔除原版的 MonoBehaviour 基类、SimpleJson 依赖与业务/编辑器专属方法 |
 
-> v0.3.0 为**纯加法**变更，不改动既有类，锁定 `#v0.1.1` 的消费方不受影响；需要这批工具的工程可将 UPM 引用升到 `#v0.3.0`。本次不接线任何消费方。
+> v0.3.0 新增上述基础设施，并包含下文的任务系统兼容性修复，保留既有公开 API。已发布固定标签 `v0.3.0`；Demo 通过该标签接入，锁定旧版本的其他消费方不受影响。完整变更见 [CHANGELOG](CHANGELOG.md)。
 
 ## 目录结构
 
@@ -62,6 +62,7 @@ GGFramework-Core/            (仓库根即包根)
     ├── CoreStructureTests.cs
     ├── SingletonLifetimeTests.cs
     ├── GTaskTests.cs
+    ├── TaskSystemTests.cs
     ├── ObjectPoolTests.cs
     ├── StateMachineTests.cs
     ├── EventBusTests.cs
@@ -75,10 +76,10 @@ GGFramework-Core/            (仓库根即包根)
 
 本包为**独立仓库**（`GGFramework-Core`），仓库根即 UPM 包根，与任何消费方工程解耦，是纯加法、可逆的"安全基础层"。
 
-消费方经 UPM git URL 引用（仓库根即包根，无需 `?path=`；建议锁定 tag 版本）。当前 `GGResource` / `GGNetwork` / `GGUI` / `GGUser` / `Demo` 五个工程均已接线并统一锁定 **v0.1.1**：
+消费方经 UPM git URL 引用（仓库根即包根，无需 `?path=`）。Demo 固定使用已发布的 **v0.3.0**；开发者只需安装 Git 并克隆 Demo，Unity Package Manager 会自动获取 Core，无需同级检出本仓库。其他模块维持各自 manifest 中的版本声明。
 
 ```json
-"com.gonglei.ggframework.core": "https://github.com/gonglei007/GGFramework-Core.git#v0.1.1"
+"com.gonglei.ggframework.core": "https://github.com/gonglei007/GGFramework-Core.git#v0.3.0"
 ```
 
 ## 运行测试
@@ -88,7 +89,7 @@ GGFramework-Core/            (仓库根即包根)
 ```json
 {
   "dependencies": {
-    "com.gonglei.ggframework.core": "file:../../../GGFramework-Core"
+    "com.gonglei.ggframework.core": "https://github.com/gonglei007/GGFramework-Core.git#v0.3.0"
   },
   "testables": [ "com.gonglei.ggframework.core" ]
 }
@@ -96,7 +97,7 @@ GGFramework-Core/            (仓库根即包根)
 
 随后在 Test Runner 窗口或用命令行 `-runTests -testPlatform EditMode` 即可发现并运行全部用例（当前 66 个，已在 Unity 6000.3.13f1 验证全绿）。
 
-上述本地路径适用于 `GGFramework/<消费仓库>/<Unity工程>/Packages/manifest.json` 的同级仓库布局；Unity 从 `Packages` 目录解析 `file:` 路径。Demo 体验大厅已接入本地 Core 0.3.0，并启用 `testables`，可直接用它运行本包测试。
+Demo 已启用 `testables`，可直接用它运行固定版本的包测试。需要修改 Core 源码时，开发者可以自行将依赖临时改为本地路径；对于 `GGFramework/<消费仓库>/<Unity工程>/Packages/manifest.json` 的同级仓库布局，该路径为 `file:../../../GGFramework-Core`（Unity 从 `Packages` 目录解析），默认发布配置不使用本地路径。
 
 ### Demo 集成修复
 
