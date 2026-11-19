@@ -88,12 +88,18 @@ GGFramework-Core/            (仓库根即包根)
 ```json
 {
   "dependencies": {
-    "com.gonglei.ggframework.core": "file:../../GGFramework-Core"
+    "com.gonglei.ggframework.core": "file:../../../GGFramework-Core"
   },
   "testables": [ "com.gonglei.ggframework.core" ]
 }
 ```
 
-随后在 Test Runner 窗口或用命令行 `-runTests -testPlatform EditMode` 即可发现并运行全部用例（当前 64 个，已在 Unity 6000.3.13f1 验证全绿）。
+随后在 Test Runner 窗口或用命令行 `-runTests -testPlatform EditMode` 即可发现并运行全部用例（当前 66 个，已在 Unity 6000.3.13f1 验证全绿）。
+
+上述本地路径适用于 `GGFramework/<消费仓库>/<Unity工程>/Packages/manifest.json` 的同级仓库布局；Unity 从 `Packages` 目录解析 `file:` 路径。Demo 体验大厅已接入本地 Core 0.3.0，并启用 `testables`，可直接用它运行本包测试。
+
+### Demo 集成修复
+
+任务系统现在会在宿主销毁时退出后台队列循环，`Init` 重复调用不会创建多个队列泵；队列忙时短暂休眠，避免空转。超时的任务可以继续结束，系统不会对仍在运行的 Task 调用 `Dispose`。`GTask` 在启动线程前登记完成回调，修复快速任务丢失回调的竞态。超时只允许队列继续推进，不会强制取消工作函数；工作函数应自行处理取消或终止。
 
 > **Phase 2 关键约束**：`Singleton`/`CoroutineUtil` 位于全局命名空间。消费方一旦引用 Core，又同时保留本地 `Assembly-CSharp` 中的同名副本，会触发类型二义性编译错误。因此"引用 Core"必须与"删除本地副本"同批完成，不能分步。

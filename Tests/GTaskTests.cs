@@ -4,11 +4,24 @@ using GGFramework.GGTask;
 
 /// <summary>
 /// GTask（线程封装）的行为测试。
-/// 注意：GTask.Start 先 thread.Start() 再赋值 onFinish，回调存在竞态，故此处不断言 onFinish 一定被调用，
-/// 只验证 ThreadStart 会被执行以及 Dispose 的安全/幂等性。
+/// 验证执行、快速任务完成回调和释放行为。
 /// </summary>
 public class GTaskTests
 {
+    [Test]
+    public void GTask_FastJob_AlwaysCallsCompletion()
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            using (var finished = new ManualResetEvent(false))
+            {
+                var task = new GTask(() => { });
+                task.Start(() => finished.Set());
+                Assert.That(finished.WaitOne(3000), Is.True);
+                task.Dispose();
+            }
+        }
+    }
     [Test]
     public void GTask_Start_RunsThreadStartDelegate()
     {

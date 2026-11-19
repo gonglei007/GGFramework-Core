@@ -19,7 +19,6 @@ namespace GGFramework.GGTask
     /// </summary>
     public class GTask
     {
-        private ManualResetEvent _terminate = new ManualResetEvent(false);
         private Thread thread = null;
         private Action onFinish = null;
         public GTask(ThreadStart threadStart)
@@ -34,22 +33,23 @@ namespace GGFramework.GGTask
                     }
                 }
             });
+            thread.IsBackground = true;
         }
 
         public void Start(Action onFinish)
         {
+            this.onFinish = onFinish;
             if (thread != null)
             {
                 thread.Start();
             }
-            this.onFinish = onFinish;
         }
 
         public void Dispose()
         {
             if (thread != null)
             {
-                thread.Interrupt();
+                if (thread.IsAlive) thread.Interrupt();
                 thread = null;
             }
         }
@@ -77,9 +77,14 @@ namespace GGFramework.GGTask
 #endif
         private readonly object jobLock = new object();
         private bool isJobRunning;
+        private volatile bool stopping;
+        private bool initialized;
 
         public void Init()
         {
+            if (initialized) return;
+            initialized = true;
+            stopping = false;
 #if DotNet40
             Task.Factory.StartNew(ProcessJobs);
 #else
@@ -118,7 +123,7 @@ namespace GGFramework.GGTask
 
         private void ProcessJobs()
         {
-            while (true)
+            while (!stopping)
             {
                 if (InnerTaskQueue.Count > 0)
                 {
@@ -145,7 +150,7 @@ namespace GGFramework.GGTask
                             }
                             else
                             {
-                                task.Dispose();
+                                // A timeout does not cancel the running task. Disposing it here throws.
                                 lock (jobLock) { isJobRunning = false; }
                             }
                         }
@@ -159,6 +164,10 @@ namespace GGFramework.GGTask
                             });
                         }
 #endif
+                    }
+                    else
+                    {
+                        Thread.Sleep(10);
                     }
                 }
                 else
@@ -175,8 +184,9 @@ namespace GGFramework.GGTask
 
         void OnDestroy()
         {
+            stopping = true;
 #if !DotNet40
-            rootThread.Abort();
+            if (rootThread != null && rootThread.IsAlive) rootThread.Join(100);
             rootThread = null;
 #endif
         }
