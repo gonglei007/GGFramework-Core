@@ -24,3 +24,7 @@ Tests~/ResourceContracts/bin/
 Tests~/ResourceContracts/obj/
 
 # 注意：.meta 文件是 UPM 包的一部分（承载稳定 GUID），必须入库，切勿忽略。
+
+# CI tool checkout and generated regression evidence
+.ci-tools/
+.ci-output/

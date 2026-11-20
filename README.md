@@ -172,3 +172,9 @@ dotnet run --project "Tests~/ResourceContracts/ResourceContracts.csproj" --confi
 缓存保护是整个使用范围的布尔标记，不是多消费者引用计数；队列取消只使租约失效，宿主还需终止 I/O 并释放过时结果。释放回调和请求工厂的重入有明确限制。完整 API、生命周期顺序与可运行示例见[资源管理接入文档](Documentation~/resource-management.md)。
 
 稳定发布仍为 `v0.3.0`；预览代码进入 `main` 不等于发布版本标签。采用项目须固定完整来源和包摘要，不能把预览版号当作验证结果。版本范围见 [CHANGELOG](CHANGELOG.md)，实际环境与结果见[预览版验证记录](Documentation~/preview-0.4.0-validation.md)。
+
+## 自动化 Unity 回归与 CI
+
+本仓契约：[ci/unity-regression.json](ci/unity-regression.json)。预览版 Unity EditMode 至少 104 项；自动生成包外的独立宿主。Demo 仍使用其固定的稳定 Core，不随 CI 工具升级。
+
+共享执行器按 [Demo `6fba3a3`](https://github.com/gonglei007/GGFramework-Demo/tree/6fba3a32aae1951df8dd034dd15f36a36ab25895/tools/ci) 固定复用，保持本模块运行时依赖不变。[本地命令、一次性 Windows runner、触发规则、artifact 与边界](https://github.com/gonglei007/GGFramework-Demo/blob/6fba3a32aae1951df8dd034dd15f36a36ab25895/tools/ci/README.md)统一维护。分支 push 会排队真实 Unity job，PR 托管契约检查不能代替 Unity；没有 runner 时不会计为 Unity 通过。每轮结束后注销 runner，不安装服务、不上传 Unity 授权。

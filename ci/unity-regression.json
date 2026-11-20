@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "unityVersion": "6000.3.13f1",
+  "repository": "gonglei007/GGFramework-Core",
+  "packageMode": true,
+  "stages": [
+    {
+      "name": "core-editmode",
+      "kind": "nunit",
+      "platform": "EditMode",
+      "minimum": 104,
+      "graphics": false
+    }
+  ]
+}
