@@ -1,0 +1,16 @@
+{
+  "name": "GGFramework.Core.Audio.Tests",
+  "references": [
+    "GGFramework.Core.Audio.Runtime"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "noEngineReferences": false
+}

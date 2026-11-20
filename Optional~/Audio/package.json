@@ -1,0 +1,13 @@
+{
+  "name": "com.gonglei.ggframework.core.audio",
+  "version": "0.1.0-preview.2",
+  "displayName": "GGFramework Core Audio Channels",
+  "description": "Optional instance-owned Unity effect voices and music/focus/pause control. Caller owns clips, cue mapping and storage.",
+  "unity": "2021.3",
+  "author": {
+    "name": "gonglei007"
+  },
+  "dependencies": {
+    "com.unity.modules.audio": "1.0.0"
+  }
+}
